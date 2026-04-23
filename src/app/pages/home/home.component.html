@@ -31,12 +31,12 @@
   <section class="hero-card reveal-on-scroll is-visible" [attr.data-experience]="guestExperiences[selectedExperienceIndex].accent">
     <div class="hero-copy">
       <p class="eyebrow">{{ couple.familyLine }}</p>
-      <p class="invitation-line">{{ couple.inviteLine }}</p>
-      <h1>{{ couple.groom }} <span>&amp;</span> {{ couple.bride }}</h1>
-      <p class="family-copy">{{ couple.groomParents }}</p>
-      <p class="family-copy">{{ couple.brideParents }}</p>
-      <p class="wedding-date">{{ couple.dateLabel }}</p>
-      <p class="wedding-location">{{ couple.locationLabel }}</p>
+      <span class="invitation-line" style="color: #5f4a3d;">{{ couple.inviteLine }}</span>
+      <h1>{{ couple.groom }} <span>&amp;</span> {{ couple.bride }}</h1><br>
+      <span class="family-copy" style="color: #5f4a3d;">{{ couple.groomParents }}</span>
+      <span class="family-copy" style="color: #5f4a3d;">{{ couple.brideParents }}</span><br>
+      <span class="wedding-date" style="color: #5f4a3d;">{{ couple.dateLabel }}</span>
+      <span class="wedding-location" style="color: #5f4a3d;">{{ couple.locationLabel }}</span><br>
 
       <div class="hero-actions">
         <a class="primary-action" href="celebration#celebrations" (click)="surpriseBlessing($event)">View ceremonies</a>
