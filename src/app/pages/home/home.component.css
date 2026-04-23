@@ -516,6 +516,7 @@ h3 {
   border: 1px solid rgba(129, 83, 155, 0.18);
   box-shadow: 0 24px 65px rgba(95, 63, 91, 0.12);
   transition: transform 240ms ease, box-shadow 240ms ease, border-color 240ms ease;
+  /* height: 30rem; */
 }
 
 .memory-card[data-experience='festive'] {

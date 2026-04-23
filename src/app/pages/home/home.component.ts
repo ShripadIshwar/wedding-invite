@@ -122,37 +122,37 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
   photoMoments: PhotoMoment[] = [
     {
       title: 'A Walk That Became Forever',
-      note: 'Walking side by side, smiling through the little things, we didn\'t just create memories — we built a journey that now leads us to forever.',
+      note: 'Walking side by side, smiling through the little things, we didn’t just create memories. With every step, we built trust, laughter, and a bond that grew stronger each day. What started as a simple journey together now leads us to forever.',
       imageUrl: 'assets/Traditional.jpg',
       stamp: 'The Beginning'
     },
     {
       title: 'In Every Glance, A Promise',
-      note: 'Some promises were never spoken aloud—they lived quietly in every glance, every smile, and every moment we chose each other without hesitation.',
+      note: 'Some promises were never spoken aloud—they lived quietly in every glance and every smile. In every moment, we chose each other without hesitation, letting love grow naturally between us. What words could not say, our hearts had already promised.',
       imageUrl: 'assets/Garden.jpg',
       stamp: 'Unspoken Vows'
     },
     {
       title: 'Through Every Season',
-      note: 'Through every phase, every challenge, and every decision, we stood by each other — laughing, holding on, and never letting go. What we built over the years wasn\'t just love… it was trust, patience, and forever.',
+      note: 'Through every phase, every challenge, and every decision, we stood by each other with unwavering faith. We laughed through the chaos, held on during the storms, and never let go of what mattered most. What we built over the years wasn’t just love—it was trust, patience, and forever.',
       imageUrl: 'assets/Falls.jpg',
       stamp: 'Still Choosing You'
     },
     {
       title: 'Hands Held, Hearts Certain',
-      note: 'What began with a simple hand to hold became the comfort of always knowing we were never walking alone, but toward a shared forever.',
+      note: 'What began with a simple hand to hold slowly became the comfort of always belonging together. In every uncertain moment, we found strength in knowing we were never walking alone. Step by step, we moved closer to a shared forever built on love and trust.',
       imageUrl: 'assets/Hand.jpg',
       stamp: 'Together Always'
     },
     {
       title: 'The Life We Dreamed Of',
-      note: 'From simple days filled with laughter to dreams we dared to chase together, we turned years of love into a promise for a lifetime. With the blessings of our families, we now celebrate not just our union — but the journey that made it possible.',
+      note: 'From simple days filled with laughter to dreams we dared to chase together, every moment shaped our story. We turned years of friendship, love, and quiet understanding into a promise for a lifetime. With the blessings of our families, we now celebrate not just our union, but the journey that made it possible.',
       imageUrl: 'assets/Lake.jpg',
       stamp: 'From Then to Now'
     },
     {
       title: 'Step by Step, Side by Side',
-      note: 'Through every season, every challenge, and every celebration, we kept choosing the same path—one filled with trust, laughter, and a lifetime ahead.',
+      note: 'Through every season, every challenge, and every celebration, we kept choosing the same path together. It was a journey filled with trust, laughter, quiet strength, and countless memories that shaped us. Side by side, we now look ahead to a lifetime still waiting to be written.',
       imageUrl: 'assets/Step.jpg',
       stamp: 'Our Journey'
     }
