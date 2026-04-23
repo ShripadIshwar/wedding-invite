@@ -31,16 +31,16 @@
   <section class="hero-card reveal-on-scroll is-visible" [attr.data-experience]="guestExperiences[selectedExperienceIndex].accent">
     <div class="hero-copy">
       <p class="eyebrow">{{ couple.familyLine }}</p>
-      <span class="invitation-line" style="color: #5f4a3d;">{{ couple.inviteLine }}</span>
+      <span class="invitation-line">{{ couple.inviteLine }}</span>
       <h1>{{ couple.groom }} <span>&amp;</span> {{ couple.bride }}</h1><br>
-      <span class="family-copy" style="color: #5f4a3d;">{{ couple.groomParents }}</span>
-      <span class="family-copy" style="color: #5f4a3d;">{{ couple.brideParents }}</span><br>
-      <span class="wedding-date" style="color: #5f4a3d;">{{ couple.dateLabel }}</span>
-      <span class="wedding-location" style="color: #5f4a3d;">{{ couple.locationLabel }}</span><br>
+      <span class="family-copy">{{ couple.groomParents }}</span>
+      <span class="family-copy">{{ couple.brideParents }}</span><br>
+      <span class="wedding-date">{{ couple.dateLabel }}</span>
+      <span class="wedding-location">{{ couple.locationLabel }}</span><br>
 
       <div class="hero-actions">
-        <a class="primary-action" href="celebration#celebrations" (click)="surpriseBlessing($event)">View ceremonies</a>
         <a class="secondary-action" href="celebration#gallery">See memories</a>
+        <a class="primary-action" href="celebration#celebrations" (click)="surpriseBlessing($event)">View ceremonies</a>        
       </div>
     </div>
 
@@ -147,7 +147,7 @@
         </div>
 
         <div class="memory-copy">
-          <p class="section-tag">Memory {{ activePhotoIndex + 1 }}</p>
+          <!-- <p class="section-tag">Memory {{ activePhotoIndex + 1 }}</p> -->
           <h3>{{ photoMoments[activePhotoIndex].title }}</h3>
           <p>{{ photoMoments[activePhotoIndex].note }}</p>
         </div>
@@ -171,9 +171,9 @@
   <section class="details-grid">
     <article class="detail-card detail-card--venue reveal-on-scroll">
       <p class="section-tag">Where love awaits</p>
-      <h2>Our cherished venue</h2>
+      <h2>Our cherished venue</h2><br>
       <p class="detail-title">{{ couple.locationLabel }}</p>
-      <p>{{ couple.address }}</p>
+      <span>{{ couple.address }}</span><br>
       <a class="text-link" href="https://maps.app.goo.gl/qPji1a7Sqg8RRTpm9" target="_blank" rel="noreferrer">Get directions</a>
     </article>
 

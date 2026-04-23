@@ -1,16 +1,35 @@
 <main class="entry-page">
   <section class="entry-stage">
+
     <div class="invitation-envelope" [class.is-opening]="opening">
-      <div class="envelope-base"></div>
+
+      <!-- The envelope body (rectangle + diamond fold lines via CSS) -->
+      <div class="envelope-body"></div>
+
+      <!-- Wax seal at the flap crease -->
+      <div class="wax-seal" aria-hidden="true">✦</div>
+
+      <!-- Flap that folds back on open -->
+      <div class="envelope-flap"></div>
+
+      <!-- The invitation card that rises out -->
       <div class="invitation-sheet">
+        <div class="ornament-line" aria-hidden="true"></div>
         <p class="entry-tag">{{ couple.familyLine }}</p>
         <h1>{{ couple.groom }} <span>&amp;</span> {{ couple.bride }}</h1>
         <p class="entry-date">{{ couple.dateLabel }}</p>
-        <button type="button" class="open-invitation-button" (click)="openInvitation($event)">
+        <div class="ornament-line" aria-hidden="true"></div>
+       
+      </div>
+       
+
+    </div>
+    <button type="button" class="open-invitation-button" (click)="openInvitation($event)">
           Open Invitation
         </button>
-      </div>
-      <div class="invitation-flap"></div>
-    </div>
+
+    <!-- Full-screen bloom transition overlay -->
+    <div class="envelope-bloom" [class.is-blooming]="opening" aria-hidden="true"></div>
+
   </section>
 </main>

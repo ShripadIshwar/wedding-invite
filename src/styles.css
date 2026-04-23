@@ -1,8 +1,30 @@
 :root {
   color-scheme: light;
   --page-background:
-    radial-gradient(circle at top, rgba(255, 248, 237, 0.92), rgba(249, 240, 229, 0.94) 35%, rgba(243, 235, 225, 0.98) 100%);
-  --text-color: #3e2a20;
+    radial-gradient(circle at top, rgba(252, 242, 249, 0.96), rgba(243, 232, 245, 0.96) 36%, rgba(234, 224, 239, 0.98) 100%);
+  --page-background-soft:
+    radial-gradient(circle at top, rgba(249, 238, 247, 0.96), rgba(238, 225, 242, 0.98) 58%, rgba(228, 213, 235, 1) 100%);
+  --text-color: #59435a;
+  --heading-color: #452b4e;
+  --muted-text: #765d7e;
+  --soft-text: #9578a2;
+  --surface: rgba(255, 249, 252, 0.86);
+  --surface-strong: rgba(255, 252, 254, 0.94);
+  --surface-soft: rgba(252, 244, 249, 0.9);
+  --surface-tint: rgba(255, 238, 245, 0.78);
+  --border-soft: rgba(153, 110, 140, 0.18);
+  --border-strong: rgba(153, 110, 140, 0.28);
+  --shadow-soft: rgba(95, 63, 91, 0.1);
+  --shadow-strong: rgba(95, 63, 91, 0.16);
+  --accent-rose: #be648f;
+  --accent-rose-deep: #a84d82;
+  --accent-pink: #d9a6cb;
+  --accent-pink-soft: #f4cfe0;
+  --accent-plum: #81539b;
+  --accent-plum-deep: #653a82;
+  --accent-lavender: #c7b0e2;
+  --accent-berry: #944f88;
+  --button-text: #fff8fc;
   --body-font: "Trebuchet MS", "Segoe UI", sans-serif;
 }
 

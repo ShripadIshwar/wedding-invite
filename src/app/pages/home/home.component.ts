@@ -97,46 +97,64 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
   ];
 
   moments: HighlightMoment[] = [
-  {
-    title: 'The Beginning',
-    note: 'From a simple friend request to a lifelong promise — our journey started with a chat that changed everything.'
-  },
-  {
-    title: 'The Proposal',
-    note: 'Under a sky full of stars, with hearts full of love, the question was asked… and forever began.'
-  },
-  {
-    title: 'Celebrations Ahead',
-    note: 'Join us as we celebrate our union with Haldi, Mehendi, Sangeet, and a beautiful wedding ceremony filled with love and traditions.'
-  },
-  {
-    title: 'Our Big Day',
-    note: 'On this special day, surrounded by family and friends, we take our vows and begin a new chapter together.'
-  },
-  {
-    title: 'Memories in the Making',
-    note: 'Every smile, every moment, every blessing — we can’t wait to create unforgettable memories with you.'
-  }
-];
+    {
+      title: 'The Beginning',
+      note: 'From a simple friend request to a lifelong promise — our journey started with a chat that changed everything.'
+    },
+    {
+      title: 'The Proposal',
+      note: 'Under a sky full of stars, with hearts full of love, the question was asked… and forever began.'
+    },
+    {
+      title: 'Celebrations Ahead',
+      note: 'Join us as we celebrate our union with Haldi, Mehendi, Sangeet, and a beautiful wedding ceremony filled with love and traditions.'
+    },
+    {
+      title: 'Our Big Day',
+      note: 'On this special day, surrounded by family and friends, we take our vows and begin a new chapter together.'
+    },
+    {
+      title: 'Memories in the Making',
+      note: 'Every smile, every moment, every blessing — we can\'t wait to create unforgettable memories with you.'
+    }
+  ];
 
   photoMoments: PhotoMoment[] = [
     {
       title: 'A Walk That Became Forever',
-      note: 'Walking side by side, smiling through the little things, we didn’t just create memories — we built a journey that now leads us to forever.',
+      note: 'Walking side by side, smiling through the little things, we didn\'t just create memories — we built a journey that now leads us to forever.',
       imageUrl: 'assets/Traditional.jpg',
       stamp: 'The Beginning'
     },
     {
+      title: 'In Every Glance, A Promise',
+      note: 'Some promises were never spoken aloud—they lived quietly in every glance, every smile, and every moment we chose each other without hesitation.',
+      imageUrl: 'assets/Garden.jpg',
+      stamp: 'Unspoken Vows'
+    },
+    {
       title: 'Through Every Season',
-      note: 'Through every phase, every challenge, and every decision, we stood by each other — laughing, holding on, and never letting go. What we built over the years wasn’t just love… it was trust, patience, and forever.',
+      note: 'Through every phase, every challenge, and every decision, we stood by each other — laughing, holding on, and never letting go. What we built over the years wasn\'t just love… it was trust, patience, and forever.',
       imageUrl: 'assets/Falls.jpg',
       stamp: 'Still Choosing You'
+    },
+    {
+      title: 'Hands Held, Hearts Certain',
+      note: 'What began with a simple hand to hold became the comfort of always knowing we were never walking alone, but toward a shared forever.',
+      imageUrl: 'assets/Hand.jpg',
+      stamp: 'Together Always'
     },
     {
       title: 'The Life We Dreamed Of',
       note: 'From simple days filled with laughter to dreams we dared to chase together, we turned years of love into a promise for a lifetime. With the blessings of our families, we now celebrate not just our union — but the journey that made it possible.',
       imageUrl: 'assets/Lake.jpg',
       stamp: 'From Then to Now'
+    },
+    {
+      title: 'Step by Step, Side by Side',
+      note: 'Through every season, every challenge, and every celebration, we kept choosing the same path—one filled with trust, laughter, and a lifetime ahead.',
+      imageUrl: 'assets/Step.jpg',
+      stamp: 'Our Journey'
     }
   ];
 
@@ -179,11 +197,15 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
   private timerId?: ReturnType<typeof setInterval>;
   private audioContext?: AudioContext;
   private audioLoopId?: ReturnType<typeof setInterval>;
+  // ── Gallery: faster at 3 seconds ──────────────────────────────────────────
+  private readonly GALLERY_INTERVAL_MS = 3000;
   private galleryAutoPlayId?: ReturnType<typeof setInterval>;
   private masterGain?: GainNode;
   private lastScrollBurstAt = 0;
   private heartId = 0;
   private revealObserver?: IntersectionObserver;
+
+  // Touch tracking (general document-level trail)
   private touchStartX = 0;
   private touchStartY = 0;
   private lastTouchTrailAt = 0;
@@ -192,7 +214,12 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
   private lastMouseTrailAt = 0;
   private isPointerDown = false;
 
-  constructor(private elementRef: ElementRef<HTMLElement>) {}
+  // ── Gallery swipe tracking ────────────────────────────────────────────────
+  private gallerySwipeStartX = 0;
+  private gallerySwipeStartY = 0;
+  private galleryIsSwiping = false;
+
+  constructor(private elementRef: ElementRef<HTMLElement>) { }
 
   ngOnInit(): void {
     this.updateCountdown();
@@ -203,6 +230,7 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
 
   ngAfterViewInit(): void {
     this.setupRevealObserver();
+    this.setupGallerySwipe();
   }
 
   ngOnDestroy(): void {
@@ -240,7 +268,6 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
       this.stopAudio();
       return;
     }
-
     this.startAudio();
   }
 
@@ -249,7 +276,6 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
       event.preventDefault();
       event.stopPropagation();
     }
-
     this.activePhotoIndex = (this.activePhotoIndex + 1) % this.photoMoments.length;
     this.restartGalleryAutoPlay();
   }
@@ -259,7 +285,6 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
       event.preventDefault();
       event.stopPropagation();
     }
-
     this.activePhotoIndex = (this.activePhotoIndex - 1 + this.photoMoments.length) % this.photoMoments.length;
     this.restartGalleryAutoPlay();
   }
@@ -269,7 +294,6 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
       event.preventDefault();
       event.stopPropagation();
     }
-
     this.activePhotoIndex = index;
     this.restartGalleryAutoPlay();
   }
@@ -323,7 +347,6 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
     if (!this.galleryAutoPlayId) {
       return;
     }
-
     clearInterval(this.galleryAutoPlayId);
     this.galleryAutoPlayId = undefined;
   }
@@ -362,11 +385,9 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
   @HostListener('document:mousemove', ['$event'])
   onMouseMove(event: MouseEvent): void {
     var now = Date.now();
-
     if (!this.isPointerDown || now - this.lastMouseTrailAt < 40) {
       return;
     }
-
     this.lastMouseTrailAt = now;
     this.createHeartBurst(event.clientX, event.clientY, 2, 'trail');
   }
@@ -376,14 +397,12 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
     if (!event.touches.length) {
       return;
     }
-
     var touch = event.touches[0];
     this.touchStartX = touch.clientX;
     this.touchStartY = touch.clientY;
     this.lastTouchX = touch.clientX;
     this.lastTouchY = touch.clientY;
     this.lastTouchTrailAt = Date.now();
-
     this.startAudio();
     this.createHeartBurst(touch.clientX, touch.clientY, 6, 'tap');
   }
@@ -393,16 +412,13 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
     if (!event.touches.length) {
       return;
     }
-
     var touch = event.touches[0];
     var now = Date.now();
-
     if (now - this.lastTouchTrailAt < 50) {
       this.lastTouchX = touch.clientX;
       this.lastTouchY = touch.clientY;
       return;
     }
-
     this.lastTouchTrailAt = now;
     this.createHeartTrail(this.lastTouchX, this.lastTouchY, touch.clientX, touch.clientY, 4);
     this.lastTouchX = touch.clientX;
@@ -418,8 +434,54 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
     if (distance < 30) {
       return;
     }
-
     this.createSwipeHearts(this.touchStartX, this.touchStartY, this.lastTouchX, this.lastTouchY);
+  }
+
+  // ── Gallery swipe setup (native touch on the gallery element) ─────────────
+  private setupGallerySwipe(): void {
+    var galleryEl = this.elementRef.nativeElement.querySelector('.gallery-stage');
+    if (!galleryEl) {
+      return;
+    }
+
+    galleryEl.addEventListener('touchstart', (e: Event) => {
+      var te = e as TouchEvent;
+      if (!te.touches.length) { return; }
+      this.gallerySwipeStartX = te.touches[0].clientX;
+      this.gallerySwipeStartY = te.touches[0].clientY;
+      this.galleryIsSwiping = true;
+      this.pauseGalleryAutoPlay();
+    }, { passive: true });
+
+    galleryEl.addEventListener('touchmove', (e: Event) => {
+      // Prevent vertical scroll only when clearly swiping horizontally
+      var te = e as TouchEvent;
+      if (!this.galleryIsSwiping || !te.touches.length) { return; }
+      var dx = Math.abs(te.touches[0].clientX - this.gallerySwipeStartX);
+      var dy = Math.abs(te.touches[0].clientY - this.gallerySwipeStartY);
+      if (dx > dy && dx > 10) {
+        e.stopPropagation();
+      }
+    }, { passive: true });
+
+    galleryEl.addEventListener('touchend', (e: Event) => {
+      if (!this.galleryIsSwiping) { return; }
+      var te = e as TouchEvent;
+      var endX = te.changedTouches.length ? te.changedTouches[0].clientX : this.gallerySwipeStartX;
+      var dx = endX - this.gallerySwipeStartX;
+      var threshold = 50;
+
+      if (Math.abs(dx) >= threshold) {
+        if (dx < 0) {
+          this.nextPhoto();
+        } else {
+          this.previousPhoto();
+        }
+      }
+
+      this.galleryIsSwiping = false;
+      this.startGalleryAutoPlay();
+    }, { passive: true });
   }
 
   private updateCountdown(): void {
@@ -451,12 +513,10 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private updateScrollProgress(): void {
     var scrollHeight = document.documentElement.scrollHeight - window.innerHeight;
-
     if (scrollHeight <= 0) {
       this.scrollProgress = 0;
       return;
     }
-
     this.scrollProgress = Math.min(window.scrollY / scrollHeight, 1);
   }
 
@@ -498,14 +558,12 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private createSwipeHearts(startX: number, startY: number, endX: number, endY: number): void {
     var steps = 8;
-
     for (var index = 0; index < steps; index += 1) {
       var progress = index / (steps - 1);
       var x = startX + ((endX - startX) * progress);
       var y = startY + ((endY - startY) * progress);
       this.createHeartBurst(x, y, 2, 'trail');
     }
-
     this.createHeartBurst(endX, endY, 8, 'tap');
   }
 
@@ -517,11 +575,9 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private emitScrollHearts(): void {
     var now = Date.now();
-
     if (now - this.lastScrollBurstAt < 320) {
       return;
     }
-
     this.lastScrollBurstAt = now;
     this.createHeartBurst(window.innerWidth * 0.82, window.innerHeight * 0.82, 3, 'trail');
   }
@@ -530,8 +586,8 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
     if (this.galleryAutoPlayId || this.photoMoments.length < 2) {
       return;
     }
-
-    this.galleryAutoPlayId = setInterval(() => this.nextPhoto(), 5200);
+    // ── Faster: 3 seconds ───────────────────────────────────────────────────
+    this.galleryAutoPlayId = setInterval(() => this.nextPhoto(), this.GALLERY_INTERVAL_MS);
   }
 
   private restartGalleryAutoPlay(): void {
@@ -545,7 +601,6 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     var elements = this.elementRef.nativeElement.querySelectorAll('.reveal-on-scroll');
-
     this.revealObserver = new IntersectionObserver((entries) => {
       entries.forEach((entry) => {
         if (entry.isIntersecting) {
@@ -563,7 +618,6 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private startAudio(): void {
     var AudioContextCtor = window.AudioContext || (window as Window & { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
-
     if (!AudioContextCtor) {
       this.audioHint = 'Ambient audio is not supported on this browser';
       return;
@@ -589,7 +643,6 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
     if (!this.audioContext) {
       return;
     }
-
     this.audioContext.suspend().then(() => {
       this.audioEnabled = false;
       this.audioHint = 'Ambient audio is paused';
@@ -600,7 +653,6 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
     if (!this.audioContext || !this.masterGain || this.audioLoopId) {
       return;
     }
-
     this.playAmbientChord();
     this.audioLoopId = setInterval(() => this.playAmbientChord(), 2600);
   }
@@ -609,11 +661,9 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
     if (!this.audioContext || !this.masterGain) {
       return;
     }
-
     var notes = [220, 261.63, 329.63, 392, 440, 523.25];
     var root = notes[Math.floor(Math.random() * notes.length)];
     var now = this.audioContext.currentTime;
-
     this.playTone(root, now, 2.6, 0.022, 'sine');
     this.playTone(root * 1.5, now + 0.12, 2.1, 0.012, 'triangle');
     this.playTone(root / 2, now, 2.8, 0.009, 'sine');
@@ -626,31 +676,36 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
     volume: number,
     type: OscillatorType
   ): void {
-    if (!this.audioContext || !this.masterGain) {
-      return;
-    }
-
-    var oscillator = this.audioContext.createOscillator();
-    var gain = this.audioContext.createGain();
-
-    oscillator.type = type;
-    oscillator.frequency.setValueAtTime(frequency, startAt);
-    gain.gain.setValueAtTime(0.0001, startAt);
-    gain.gain.linearRampToValueAtTime(volume, startAt + 0.45);
-    gain.gain.exponentialRampToValueAtTime(0.0001, startAt + duration);
-
-    oscillator.connect(gain);
-    gain.connect(this.masterGain);
-    oscillator.start(startAt);
-    oscillator.stop(startAt + duration);
+    // if (!this.audioContext || !this.masterGain) {
+    //   return;
+    // }
+    // var oscillator = this.audioContext.createOscillator();
+    // var gain = this.audioContext.createGain();
+    // oscillator.type = type;
+    // oscillator.frequency.setValueAtTime(frequency, startAt);
+    // gain.gain.setValueAtTime(0.0001, startAt);
+    // gain.gain.linearRampToValueAtTime(volume, startAt + 0.45);
+    // gain.gain.exponentialRampToValueAtTime(0.0001, startAt + duration);
+    // oscillator.connect(gain);
+    // gain.connect(this.masterGain);
+    // oscillator.start(startAt);
+    // oscillator.stop(startAt + duration);
   }
 
   private randomBetween(min: number, max: number): number {
     return Math.random() * (max - min) + min;
   }
 
+  // ── Reddish/crimson hearts instead of purple ──────────────────────────────
   private pickHeartColor(): string {
-    var colors = ['#d13447', '#bb1f3a', '#e14a5d', '#a80f2d', '#f06d7d'];
+    var colors = [
+      '#c0392b',  // crimson
+      '#e74c3c',  // bright red
+      '#a93226',  // deep red
+      '#e8556d',  // warm rose-red
+      '#b03a4b',  // muted red
+      '#d44e6a'   // rose-red
+    ];
     return colors[Math.floor(Math.random() * colors.length)];
   }
 }

@@ -30,8 +30,10 @@ export class InvitationEntryComponent {
 
     this.opening = true;
 
+    // Bloom animation starts at 800ms and lasts 950ms → total ≈ 1800ms
+    // Navigate at 1750ms so the page switch happens while still covered
     setTimeout(() => {
       this.router.navigateByUrl('/celebration');
-    }, 950);
+    }, 3100);
   }
 }
