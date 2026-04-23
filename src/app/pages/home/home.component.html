@@ -1,10 +1,14 @@
 <main class="invite-page">
-  <!-- <div class="floating-controls">
+  <!-- <div class="scroll-progress" aria-hidden="true">
+    <span [style.transform]="'scaleX(' + scrollProgress + ')'"></span>
+  </div> -->
+
+  <!-- <div class="floating-controls reveal-on-scroll is-visible">
     <button type="button" class="sound-toggle" (click)="toggleAudio()">
       <span class="sound-dot" [class.active]="audioEnabled"></span>
       {{ audioEnabled ? 'Sound On' : 'Sound Off' }}
     </button>
-    <p class="audio-hint">{{ audioHint }}</p>
+    <p class="audio-hint">{{ copiedPhone || audioHint }}</p>
   </div> -->
 
   <div class="heart-layer" aria-hidden="true">
@@ -20,10 +24,11 @@
       [style.--heart-duration.ms]="heart.duration"
       [style.--heart-delay.ms]="heart.delay"
       [style.--heart-color]="heart.hue"
+      [style.--heart-size.rem]="heart.size"
     >&#10084;</span>
   </div>
 
-  <section class="hero-card">
+  <section class="hero-card reveal-on-scroll is-visible" [attr.data-experience]="guestExperiences[selectedExperienceIndex].accent">
     <div class="hero-copy">
       <p class="eyebrow">{{ couple.familyLine }}</p>
       <p class="invitation-line">{{ couple.inviteLine }}</p>
@@ -34,7 +39,7 @@
       <p class="wedding-location">{{ couple.locationLabel }}</p>
 
       <div class="hero-actions">
-        <a class="primary-action" href="#celebrations">View ceremonies</a>
+        <a class="primary-action" href="#celebrations" (click)="surpriseBlessing($event)">View ceremonies</a>
         <a class="secondary-action" href="#gallery">See memories</a>
       </div>
     </div>
@@ -51,7 +56,7 @@
     </div>
   </section>
 
-  <section class="countdown-section">
+  <section class="countdown-section reveal-on-scroll">
     <div class="section-heading">
       <p class="section-tag">The Big Day</p>
       <h2>The start of a beautiful journey, shared with the ones we love most.</h2>
@@ -66,19 +71,10 @@
   </section>
 
   <section class="story-grid">
-    <article class="story-card story-card--feature">
+    <article class="story-card story-card--feature reveal-on-scroll">
       <p class="section-tag">Our journey</p>
       <h2>From where it all began to the promise of forever.</h2>
-      <p>
-        What started as a simple moment, a conversation, a meeting, a spark, slowly grew into something
-        neither of us could have fully imagined. Through time, distance, laughter, and challenges, we found
-        comfort in each other and built a bond that felt both effortless and deeply meaningful.
-      </p>
-      <p>
-        Every memory we have created has shaped us: the small everyday moments, the milestones, and the quiet
-        understanding that this is where we belong. This journey has not just been about love, but about
-        growing together, learning together, and choosing each other every single day.
-      </p>
+      
       <p>
         Our wedding is a reflection of that journey: a coming together of our stories, our families, and the
         future we are stepping into. It is not just a celebration of a single day, but the beginning of a
@@ -86,7 +82,7 @@
       </p>
     </article>
 
-    <article class="story-card highlights-card">
+    <article class="story-card highlights-card reveal-on-scroll">
       <div class="highlight" *ngFor="let moment of moments; trackBy: trackByTitle">
         <h3>{{ moment.title }}</h3>
         <p>{{ moment.note }}</p>
@@ -94,18 +90,57 @@
     </article>
   </section>
 
-  <section class="gallery-section" id="gallery">
+  <!-- <section class="interaction-grid">
+    <article class="interaction-card reveal-on-scroll" [attr.data-experience]="guestExperiences[selectedExperienceIndex].accent">
+      <div class="section-heading">
+        <p class="section-tag">Make it yours</p>
+        <h2>{{ interactionTitle }}</h2>
+      </div>
+
+      <p>{{ interactionNote }}</p>
+
+      <div class="experience-pills">
+        <button
+          type="button"
+          class="experience-pill"
+          *ngFor="let experience of guestExperiences; let index = index"
+          [class.is-selected]="index === selectedExperienceIndex"
+          (click)="selectExperience(index, $event)"
+        >
+          {{ experience.title }}
+        </button>
+      </div>
+
+      <div class="blessing-panel">
+        <p class="blessing-copy">{{ currentBlessing }}</p>
+        <button type="button" class="secondary-action" (click)="surpriseBlessing($event)">Show another blessing</button>
+      </div>
+    </article>
+
+    <article class="interaction-card interaction-card--compact reveal-on-scroll">
+      <p class="section-tag">Quick help</p>
+      <h3>Need the RSVP number quickly?</h3>
+      <p>Tap once to copy a contact number and share the invitation with family without hunting for details.</p>
+
+      <div class="quick-actions">
+        <button type="button" class="quick-action" (click)="copyPhone(couple.rsvpPhone1, $event)">Copy {{ couple.rsvpPhone1 }}</button>
+        <button type="button" class="quick-action" (click)="copyPhone(couple.rsvpPhone2, $event)">Copy {{ couple.rsvpPhone2 }}</button>
+      </div>
+    </article>
+  </section> -->
+
+  <section class="gallery-section reveal-on-scroll" id="gallery">
     <div class="section-heading">
       <p class="section-tag">A glimpse of us</p>
       <h2>Our beautiful moments, held in a calmer and more reliable gallery.</h2>
     </div>
 
-    <div class="gallery-stage">
+    <div class="gallery-stage" (mouseenter)="pauseGalleryAutoPlay()" (mouseleave)="resumeGalleryAutoPlay()">
       <button type="button" class="gallery-nav" (click)="previousPhoto($event)" aria-label="Previous memory">&#8249;</button>
 
-      <article class="memory-card">
+      <article class="memory-card" [attr.data-experience]="guestExperiences[selectedExperienceIndex].accent">
         <div class="memory-photo">
-          <img [src]="photoMoments[activePhotoIndex].imageUrl" alt="memory" />
+          <img [src]="photoMoments[activePhotoIndex].imageUrl" [alt]="photoMoments[activePhotoIndex].title" />
           <span class="postcard-stamp">
             {{ photoMoments[activePhotoIndex].stamp }}
           </span>
@@ -134,7 +169,7 @@
   </section>
 
   <section class="details-grid">
-    <article class="detail-card detail-card--venue">
+    <article class="detail-card detail-card--venue reveal-on-scroll">
       <p class="section-tag">Where love awaits</p>
       <h2>Our cherished venue</h2>
       <p class="detail-title">{{ couple.locationLabel }}</p>
@@ -142,7 +177,7 @@
       <a class="text-link" href="https://maps.app.goo.gl/qPji1a7Sqg8RRTpm9" target="_blank" rel="noreferrer">Get directions</a>
     </article>
 
-    <article class="detail-card detail-card--rsvp">
+    <article class="detail-card detail-card--rsvp reveal-on-scroll">
       <p class="section-tag">Join the celebration</p>
       <h2>Celebrate with us</h2>
       <p>For blessings, confirmations, travel help, and family coordination, please connect with us directly.</p>
@@ -151,7 +186,7 @@
     </article>
   </section>
 
-  <section class="schedule-section" id="celebrations">
+  <section class="schedule-section reveal-on-scroll" id="celebrations">
     <div class="section-heading">
       <p class="section-tag">The celebration unfolds</p>
       <h2>Three heartfelt ceremonies, one unforgettable union.</h2>
@@ -168,7 +203,7 @@
     </div>
   </section>
 
-  <section class="footer-card">
+  <section class="footer-card reveal-on-scroll">
     <p class="section-tag">With love</p>
     <h2>We cannot wait to celebrate this sacred day with you.</h2>
     <p>With warm regards from our families.</p>

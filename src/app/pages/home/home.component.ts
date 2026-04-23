@@ -1,4 +1,4 @@
-import { Component, HostListener, OnDestroy, OnInit } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, HostListener, OnDestroy, OnInit } from '@angular/core';
 
 interface InviteEvent {
   day: string;
@@ -32,6 +32,13 @@ interface HeartParticle {
   duration: number;
   delay: number;
   hue: string;
+  size: number;
+}
+
+interface GuestExperience {
+  title: string;
+  note: string;
+  accent: string;
 }
 
 @Component({
@@ -39,7 +46,7 @@ interface HeartParticle {
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.css']
 })
-export class HomeComponent implements OnInit, OnDestroy {
+export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
   couple = {
     bride: 'Swati',
     groom: 'Shripad',
@@ -137,18 +144,65 @@ export class HomeComponent implements OnInit, OnDestroy {
   activePhotoIndex = 0;
   audioEnabled = false;
   audioHint = 'Tap anywhere to start the soothing audio';
+  scrollProgress = 0;
+  selectedExperienceIndex = 0;
+  interactionTitle = 'How will you arrive at the celebration?';
+  interactionNote = 'Pick the mood that feels most like you, and we will set the page to match it.';
+  copiedPhone = '';
+  currentBlessing = 'We are saving a warm place for you in our happiest memories.';
+
+  guestExperiences: GuestExperience[] = [
+    {
+      title: 'Arrive with family',
+      note: 'Set a calm, graceful mood with softer motion and a timeless welcome.',
+      accent: 'family'
+    },
+    {
+      title: 'Bring the festive energy',
+      note: 'Turn the page a little brighter with a more playful, celebratory feel.',
+      accent: 'festive'
+    },
+    {
+      title: 'Send your blessings',
+      note: 'Keep the experience gentle and heartfelt, centered on the ceremony itself.',
+      accent: 'blessing'
+    }
+  ];
+
+  blessingMessages = [
+    'May your day be filled with sacred vows, warm laughter, and blessings that linger for years.',
+    'May every ritual lead to joy, every smile become a memory, and every blessing stay with you always.',
+    'Wishing the couple a lifetime of calm mornings, meaningful traditions, and love that only grows deeper.',
+    'May this wedding day be the start of a home filled with grace, kindness, and beautiful togetherness.'
+  ];
 
   private timerId?: ReturnType<typeof setInterval>;
   private audioContext?: AudioContext;
   private audioLoopId?: ReturnType<typeof setInterval>;
+  private galleryAutoPlayId?: ReturnType<typeof setInterval>;
   private masterGain?: GainNode;
   private lastScrollBurstAt = 0;
   private heartId = 0;
+  private revealObserver?: IntersectionObserver;
+  private touchStartX = 0;
+  private touchStartY = 0;
+  private lastTouchTrailAt = 0;
+  private lastTouchX = 0;
+  private lastTouchY = 0;
+  private lastMouseTrailAt = 0;
+  private isPointerDown = false;
+
+  constructor(private elementRef: ElementRef<HTMLElement>) {}
 
   ngOnInit(): void {
     this.updateCountdown();
+    this.updateScrollProgress();
     this.timerId = setInterval(() => this.updateCountdown(), 1000);
-    setTimeout(() => this.startAudio(), 400);
+    this.startGalleryAutoPlay();
+  }
+
+  ngAfterViewInit(): void {
+    this.setupRevealObserver();
   }
 
   ngOnDestroy(): void {
@@ -158,6 +212,14 @@ export class HomeComponent implements OnInit, OnDestroy {
 
     if (this.audioLoopId) {
       clearInterval(this.audioLoopId);
+    }
+
+    if (this.galleryAutoPlayId) {
+      clearInterval(this.galleryAutoPlayId);
+    }
+
+    if (this.revealObserver) {
+      this.revealObserver.disconnect();
     }
 
     if (this.audioContext) {
@@ -189,6 +251,7 @@ export class HomeComponent implements OnInit, OnDestroy {
     }
 
     this.activePhotoIndex = (this.activePhotoIndex + 1) % this.photoMoments.length;
+    this.restartGalleryAutoPlay();
   }
 
   previousPhoto(event?: Event): void {
@@ -198,6 +261,7 @@ export class HomeComponent implements OnInit, OnDestroy {
     }
 
     this.activePhotoIndex = (this.activePhotoIndex - 1 + this.photoMoments.length) % this.photoMoments.length;
+    this.restartGalleryAutoPlay();
   }
 
   setPhoto(index: number, event?: Event): void {
@@ -207,17 +271,104 @@ export class HomeComponent implements OnInit, OnDestroy {
     }
 
     this.activePhotoIndex = index;
+    this.restartGalleryAutoPlay();
+  }
+
+  selectExperience(index: number, event?: Event): void {
+    if (event) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
+
+    this.selectedExperienceIndex = index;
+
+    if (index === 0) {
+      this.interactionTitle = 'A graceful arrival suits this celebration beautifully.';
+      this.interactionNote = 'We softened the mood a little for guests who want a more traditional, intimate feel.';
+    } else if (index === 1) {
+      this.interactionTitle = 'The page is ready for a joyful entrance.';
+      this.interactionNote = 'A brighter celebratory mood pairs perfectly with sangeet smiles and big family energy.';
+      this.createHeartBurst(window.innerWidth * 0.5, window.innerHeight * 0.45, 18);
+    } else {
+      this.interactionTitle = 'Your blessings are the most beautiful part of the day.';
+      this.interactionNote = 'This mode keeps the focus on warmth, love, and the promise of the ceremony ahead.';
+    }
+  }
+
+  surpriseBlessing(event?: Event): void {
+    var blessingIndex = Math.floor(Math.random() * this.blessingMessages.length);
+    this.currentBlessing = this.blessingMessages[blessingIndex];
+    this.createHeartBurst(window.innerWidth * 0.5, window.innerHeight * 0.35, 14);
+  }
+
+  copyPhone(phone: string, event?: Event): void {
+    if (event) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
+
+    if (!navigator.clipboard || !navigator.clipboard.writeText) {
+      this.copiedPhone = 'Copy is not supported on this browser';
+      return;
+    }
+
+    navigator.clipboard.writeText(phone).then(() => {
+      this.copiedPhone = 'Copied ' + phone;
+    }).catch(() => {
+      this.copiedPhone = 'Unable to copy right now';
+    });
+  }
+
+  pauseGalleryAutoPlay(): void {
+    if (!this.galleryAutoPlayId) {
+      return;
+    }
+
+    clearInterval(this.galleryAutoPlayId);
+    this.galleryAutoPlayId = undefined;
+  }
+
+  resumeGalleryAutoPlay(): void {
+    this.startGalleryAutoPlay();
   }
 
   @HostListener('window:scroll')
   onWindowScroll(): void {
+    this.updateScrollProgress();
     this.emitScrollHearts();
   }
 
   @HostListener('document:click', ['$event'])
   onDocumentClick(event: MouseEvent): void {
     this.startAudio();
-    this.createHeartBurst(event.clientX, event.clientY, 10);
+    this.createHeartBurst(event.clientX, event.clientY, 8, 'tap');
+  }
+
+  @HostListener('document:mousedown')
+  onMouseDown(): void {
+    this.isPointerDown = true;
+  }
+
+  @HostListener('document:mouseup')
+  onMouseUp(): void {
+    this.isPointerDown = false;
+  }
+
+  @HostListener('document:mouseleave')
+  onMouseLeave(): void {
+    this.isPointerDown = false;
+  }
+
+  @HostListener('document:mousemove', ['$event'])
+  onMouseMove(event: MouseEvent): void {
+    var now = Date.now();
+
+    if (!this.isPointerDown || now - this.lastMouseTrailAt < 40) {
+      return;
+    }
+
+    this.lastMouseTrailAt = now;
+    this.createHeartBurst(event.clientX, event.clientY, 2, 'trail');
   }
 
   @HostListener('document:touchstart', ['$event'])
@@ -227,8 +378,48 @@ export class HomeComponent implements OnInit, OnDestroy {
     }
 
     var touch = event.touches[0];
+    this.touchStartX = touch.clientX;
+    this.touchStartY = touch.clientY;
+    this.lastTouchX = touch.clientX;
+    this.lastTouchY = touch.clientY;
+    this.lastTouchTrailAt = Date.now();
+
     this.startAudio();
-    this.createHeartBurst(touch.clientX, touch.clientY, 10);
+    this.createHeartBurst(touch.clientX, touch.clientY, 6, 'tap');
+  }
+
+  @HostListener('document:touchmove', ['$event'])
+  onTouchMove(event: TouchEvent): void {
+    if (!event.touches.length) {
+      return;
+    }
+
+    var touch = event.touches[0];
+    var now = Date.now();
+
+    if (now - this.lastTouchTrailAt < 50) {
+      this.lastTouchX = touch.clientX;
+      this.lastTouchY = touch.clientY;
+      return;
+    }
+
+    this.lastTouchTrailAt = now;
+    this.createHeartTrail(this.lastTouchX, this.lastTouchY, touch.clientX, touch.clientY, 4);
+    this.lastTouchX = touch.clientX;
+    this.lastTouchY = touch.clientY;
+  }
+
+  @HostListener('document:touchend', ['$event'])
+  onTouchEnd(): void {
+    var deltaX = this.lastTouchX - this.touchStartX;
+    var deltaY = this.lastTouchY - this.touchStartY;
+    var distance = Math.sqrt((deltaX * deltaX) + (deltaY * deltaY));
+
+    if (distance < 30) {
+      return;
+    }
+
+    this.createSwipeHearts(this.touchStartX, this.touchStartY, this.lastTouchX, this.lastTouchY);
   }
 
   private updateCountdown(): void {
@@ -258,28 +449,64 @@ export class HomeComponent implements OnInit, OnDestroy {
     ];
   }
 
+  private updateScrollProgress(): void {
+    var scrollHeight = document.documentElement.scrollHeight - window.innerHeight;
+
+    if (scrollHeight <= 0) {
+      this.scrollProgress = 0;
+      return;
+    }
+
+    this.scrollProgress = Math.min(window.scrollY / scrollHeight, 1);
+  }
+
   private padValue(value: number): string {
     return value.toString().padStart(2, '0');
   }
 
-  private createHeartBurst(x: number, y: number, count: number): void {
+  private createHeartBurst(x: number, y: number, count: number, mode: 'burst' | 'tap' | 'trail' = 'burst'): void {
     for (var index = 0; index < count; index += 1) {
+      var isTrail = mode === 'trail';
+      var isTap = mode === 'tap';
       var particle: HeartParticle = {
         id: this.heartId++,
         x: x,
         y: y,
-        driftX: this.randomBetween(-90, 90),
-        driftY: this.randomBetween(-140, -40),
-        rotate: this.randomBetween(-35, 35),
-        scale: this.randomBetween(0.8, 1.5),
-        duration: this.randomBetween(900, 1600),
-        delay: this.randomBetween(0, 140),
-        hue: this.pickHeartColor()
+        driftX: isTrail ? this.randomBetween(-14, 14) : isTap ? this.randomBetween(-26, 26) : this.randomBetween(-70, 70),
+        driftY: isTrail ? this.randomBetween(-24, 10) : isTap ? this.randomBetween(-40, -6) : this.randomBetween(-120, -28),
+        rotate: this.randomBetween(-25, 25),
+        scale: isTrail ? this.randomBetween(0.62, 0.88) : isTap ? this.randomBetween(0.72, 1.02) : this.randomBetween(0.78, 1.14),
+        duration: isTrail ? this.randomBetween(520, 860) : isTap ? this.randomBetween(680, 980) : this.randomBetween(900, 1450),
+        delay: this.randomBetween(0, isTrail ? 60 : 120),
+        hue: this.pickHeartColor(),
+        size: isTrail ? this.randomBetween(0.42, 0.58) : isTap ? this.randomBetween(0.5, 0.68) : this.randomBetween(0.56, 0.74)
       };
 
       this.hearts = this.hearts.concat(particle);
       this.clearHeartLater(particle.id, particle.duration + particle.delay + 120);
     }
+  }
+
+  private createHeartTrail(startX: number, startY: number, endX: number, endY: number, count: number): void {
+    for (var index = 0; index < count; index += 1) {
+      var progress = count === 1 ? 1 : index / (count - 1);
+      var x = startX + ((endX - startX) * progress);
+      var y = startY + ((endY - startY) * progress);
+      this.createHeartBurst(x, y, 1, 'trail');
+    }
+  }
+
+  private createSwipeHearts(startX: number, startY: number, endX: number, endY: number): void {
+    var steps = 8;
+
+    for (var index = 0; index < steps; index += 1) {
+      var progress = index / (steps - 1);
+      var x = startX + ((endX - startX) * progress);
+      var y = startY + ((endY - startY) * progress);
+      this.createHeartBurst(x, y, 2, 'trail');
+    }
+
+    this.createHeartBurst(endX, endY, 8, 'tap');
   }
 
   private clearHeartLater(id: number, duration: number): void {
@@ -296,7 +523,42 @@ export class HomeComponent implements OnInit, OnDestroy {
     }
 
     this.lastScrollBurstAt = now;
-    this.createHeartBurst(window.innerWidth * 0.82, window.innerHeight * 0.82, 4);
+    this.createHeartBurst(window.innerWidth * 0.82, window.innerHeight * 0.82, 3, 'trail');
+  }
+
+  private startGalleryAutoPlay(): void {
+    if (this.galleryAutoPlayId || this.photoMoments.length < 2) {
+      return;
+    }
+
+    this.galleryAutoPlayId = setInterval(() => this.nextPhoto(), 5200);
+  }
+
+  private restartGalleryAutoPlay(): void {
+    this.pauseGalleryAutoPlay();
+    this.startGalleryAutoPlay();
+  }
+
+  private setupRevealObserver(): void {
+    if (typeof window === 'undefined' || !('IntersectionObserver' in window)) {
+      return;
+    }
+
+    var elements = this.elementRef.nativeElement.querySelectorAll('.reveal-on-scroll');
+
+    this.revealObserver = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('is-visible');
+          this.revealObserver?.unobserve(entry.target);
+        }
+      });
+    }, {
+      threshold: 0.18,
+      rootMargin: '0px 0px -8% 0px'
+    });
+
+    elements.forEach((element) => this.revealObserver?.observe(element));
   }
 
   private startAudio(): void {
@@ -388,7 +650,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   }
 
   private pickHeartColor(): string {
-    var colors = ['#f08aa0', '#ec6f8f', '#f6ad7b', '#f4c56a', '#d57d9f'];
+    var colors = ['#d13447', '#bb1f3a', '#e14a5d', '#a80f2d', '#f06d7d'];
     return colors[Math.floor(Math.random() * colors.length)];
   }
 }

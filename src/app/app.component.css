@@ -1,0 +1,8 @@
+:host {
+  display: block;
+}
+
+.route-shell {
+  min-height: 100vh;
+  position: relative;
+}

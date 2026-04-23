@@ -1,0 +1,168 @@
+:host {
+  display: block;
+  min-height: 100vh;
+}
+
+.entry-page {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 1.25rem;
+  background:
+    radial-gradient(circle at top, rgba(255, 244, 235, 0.96), rgba(243, 228, 213, 0.99) 56%, rgba(233, 213, 194, 1) 100%);
+}
+
+.entry-stage {
+  width: min(100%, 38rem);
+  display: grid;
+  place-items: center;
+}
+
+.invitation-envelope {
+  position: relative;
+  width: min(92vw, 34rem);
+  aspect-ratio: 1.08 / 1;
+  perspective: 1400px;
+}
+
+.envelope-base,
+.invitation-sheet,
+.invitation-flap {
+  position: absolute;
+  inset: 0;
+  border-radius: 1.8rem;
+}
+
+.envelope-base {
+  background:
+    linear-gradient(145deg, rgba(183, 124, 91, 0.98), rgba(153, 93, 68, 0.98)),
+    linear-gradient(180deg, rgba(255, 249, 241, 0.3), transparent);
+  box-shadow: 0 24px 56px rgba(83, 51, 34, 0.18);
+}
+
+.invitation-sheet {
+  inset: 1.1rem;
+  display: grid;
+  align-content: center;
+  justify-items: center;
+  gap: 1rem;
+  padding: 2.4rem 2rem 3.8rem;
+  text-align: center;
+  background:
+    linear-gradient(180deg, rgba(255, 252, 247, 0.98), rgba(248, 238, 225, 0.96)),
+    repeating-linear-gradient(
+      135deg,
+      rgba(183, 125, 74, 0.06) 0,
+      rgba(183, 125, 74, 0.06) 10px,
+      transparent 10px,
+      transparent 20px
+    );
+  border: 1px solid rgba(166, 114, 78, 0.22);
+  box-shadow: 0 28px 60px rgba(83, 51, 34, 0.14);
+  z-index: 1;
+}
+
+.entry-tag {
+  margin: 0;
+  max-width: 24rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  font-size: 0.72rem;
+  color: #8a6245;
+}
+
+h1 {
+  margin: 0;
+  max-width: 100%;
+  font-size: clamp(2.4rem, 8vw, 4.4rem);
+  line-height: 1.02;
+  color: #2f2018;
+  font-family: "Palatino Linotype", "Book Antiqua", Georgia, serif;
+}
+
+h1 span {
+  color: #b25a4d;
+}
+
+.entry-date {
+  margin: 0;
+  color: #5f4a3d;
+  font-size: 1rem;
+}
+
+.open-invitation-button {
+  border: 0;
+  border-radius: 999px;
+  padding: 0.95rem 1.5rem;
+  color: #fff7ef;
+  background: linear-gradient(135deg, #a13d38, #d05a5a);
+  box-shadow: 0 18px 34px rgba(161, 61, 56, 0.28);
+  cursor: pointer;
+  transition: transform 180ms ease, box-shadow 180ms ease;
+}
+
+.open-invitation-button:hover {
+  transform: translateY(-2px);
+}
+
+.invitation-flap {
+  background:
+    linear-gradient(145deg, rgba(189, 134, 97, 0.98), rgba(154, 95, 68, 0.98)),
+    linear-gradient(180deg, rgba(255, 249, 241, 0.3), transparent);
+  clip-path: polygon(0 0, 100% 0, 50% 40%);
+  transform-origin: top center;
+  box-shadow: 0 20px 45px rgba(83, 51, 34, 0.18);
+  z-index: 2;
+}
+
+.invitation-envelope.is-opening .invitation-flap {
+  animation: envelopeOpen 820ms cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}
+
+.invitation-envelope.is-opening .invitation-sheet {
+  animation: invitationLift 900ms cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}
+
+@keyframes envelopeOpen {
+  0% {
+    transform: rotateX(0deg);
+  }
+
+  100% {
+    transform: rotateX(-176deg);
+  }
+}
+
+@keyframes invitationLift {
+  0% {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+
+  70% {
+    transform: translateY(-2.5rem) scale(1.02);
+    opacity: 1;
+  }
+
+  100% {
+    transform: translateY(-8rem) scale(0.96);
+    opacity: 0;
+  }
+}
+
+@media (max-width: 600px) {
+  .invitation-sheet {
+    padding: 11rem 1.4rem 3.2rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .open-invitation-button {
+    transition: none;
+  }
+
+  .invitation-envelope.is-opening .invitation-flap,
+  .invitation-envelope.is-opening .invitation-sheet {
+    animation: none;
+  }
+}

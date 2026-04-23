@@ -1,0 +1,16 @@
+<main class="entry-page">
+  <section class="entry-stage">
+    <div class="invitation-envelope" [class.is-opening]="opening">
+      <div class="envelope-base"></div>
+      <div class="invitation-sheet">
+        <p class="entry-tag">{{ couple.familyLine }}</p>
+        <h1>{{ couple.groom }} <span>&amp;</span> {{ couple.bride }}</h1>
+        <p class="entry-date">{{ couple.dateLabel }}</p>
+        <button type="button" class="open-invitation-button" (click)="openInvitation($event)">
+          Open Invitation
+        </button>
+      </div>
+      <div class="invitation-flap"></div>
+    </div>
+  </section>
+</main>
