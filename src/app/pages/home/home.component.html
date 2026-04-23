@@ -1,0 +1,176 @@
+<main class="invite-page">
+  <!-- <div class="floating-controls">
+    <button type="button" class="sound-toggle" (click)="toggleAudio()">
+      <span class="sound-dot" [class.active]="audioEnabled"></span>
+      {{ audioEnabled ? 'Sound On' : 'Sound Off' }}
+    </button>
+    <p class="audio-hint">{{ audioHint }}</p>
+  </div> -->
+
+  <div class="heart-layer" aria-hidden="true">
+    <span
+      *ngFor="let heart of hearts; trackBy: trackByHeart"
+      class="heart-particle"
+      [style.left.px]="heart.x"
+      [style.top.px]="heart.y"
+      [style.--drift-x.px]="heart.driftX"
+      [style.--drift-y.px]="heart.driftY"
+      [style.--heart-rotate.deg]="heart.rotate"
+      [style.--heart-scale]="heart.scale"
+      [style.--heart-duration.ms]="heart.duration"
+      [style.--heart-delay.ms]="heart.delay"
+      [style.--heart-color]="heart.hue"
+    >&#10084;</span>
+  </div>
+
+  <section class="hero-card">
+    <div class="hero-copy">
+      <p class="eyebrow">{{ couple.familyLine }}</p>
+      <p class="invitation-line">{{ couple.inviteLine }}</p>
+      <h1>{{ couple.groom }} <span>&amp;</span> {{ couple.bride }}</h1>
+      <p class="family-copy">{{ couple.groomParents }}</p>
+      <p class="family-copy">{{ couple.brideParents }}</p>
+      <p class="wedding-date">{{ couple.dateLabel }}</p>
+      <p class="wedding-location">{{ couple.locationLabel }}</p>
+
+      <div class="hero-actions">
+        <a class="primary-action" href="#celebrations">View ceremonies</a>
+        <a class="secondary-action" href="#gallery">See memories</a>
+      </div>
+    </div>
+
+    <div class="hero-frame">
+      <div class="ornament ornament-top"></div>
+      <div class="portrait-card">
+        <span class="seal">Wedding Invite</span>
+        <p class="portrait-label">The Big Day</p>
+        <p class="portrait-title">{{ couple.dateLabel }}</p>
+        <p class="portrait-note">{{ couple.address }}</p>
+      </div>
+      <div class="ornament ornament-bottom"></div>
+    </div>
+  </section>
+
+  <section class="countdown-section">
+    <div class="section-heading">
+      <p class="section-tag">The Big Day</p>
+      <h2>The start of a beautiful journey, shared with the ones we love most.</h2>
+    </div>
+
+    <div class="countdown-grid">
+      <article class="countdown-card" *ngFor="let item of countdown">
+        <strong>{{ item.value }}</strong>
+        <span>{{ item.label }}</span>
+      </article>
+    </div>
+  </section>
+
+  <section class="story-grid">
+    <article class="story-card story-card--feature">
+      <p class="section-tag">Our journey</p>
+      <h2>From where it all began to the promise of forever.</h2>
+      <p>
+        What started as a simple moment, a conversation, a meeting, a spark, slowly grew into something
+        neither of us could have fully imagined. Through time, distance, laughter, and challenges, we found
+        comfort in each other and built a bond that felt both effortless and deeply meaningful.
+      </p>
+      <p>
+        Every memory we have created has shaped us: the small everyday moments, the milestones, and the quiet
+        understanding that this is where we belong. This journey has not just been about love, but about
+        growing together, learning together, and choosing each other every single day.
+      </p>
+      <p>
+        Our wedding is a reflection of that journey: a coming together of our stories, our families, and the
+        future we are stepping into. It is not just a celebration of a single day, but the beginning of a
+        lifelong promise to stand by each other and continue writing our story together.
+      </p>
+    </article>
+
+    <article class="story-card highlights-card">
+      <div class="highlight" *ngFor="let moment of moments; trackBy: trackByTitle">
+        <h3>{{ moment.title }}</h3>
+        <p>{{ moment.note }}</p>
+      </div>
+    </article>
+  </section>
+
+  <section class="gallery-section" id="gallery">
+    <div class="section-heading">
+      <p class="section-tag">A glimpse of us</p>
+      <h2>Our beautiful moments, held in a calmer and more reliable gallery.</h2>
+    </div>
+
+    <div class="gallery-stage">
+      <button type="button" class="gallery-nav" (click)="previousPhoto($event)" aria-label="Previous memory">&#8249;</button>
+
+      <article class="memory-card">
+        <div class="memory-photo">
+          <img [src]="photoMoments[activePhotoIndex].imageUrl" alt="memory" />
+          <span class="postcard-stamp">
+            {{ photoMoments[activePhotoIndex].stamp }}
+          </span>
+        </div>
+
+        <div class="memory-copy">
+          <p class="section-tag">Memory {{ activePhotoIndex + 1 }}</p>
+          <h3>{{ photoMoments[activePhotoIndex].title }}</h3>
+          <p>{{ photoMoments[activePhotoIndex].note }}</p>
+        </div>
+      </article>
+
+      <button type="button" class="gallery-nav" (click)="nextPhoto($event)" aria-label="Next memory">&#8250;</button>
+    </div>
+
+    <div class="gallery-dots">
+      <button
+        type="button"
+        *ngFor="let photo of photoMoments; let index = index; trackBy: trackByTitle"
+        class="gallery-dot"
+        [class.is-active]="index === activePhotoIndex"
+        (click)="setPhoto(index, $event)"
+        [attr.aria-label]="'Show memory ' + (index + 1)"
+      ></button>
+    </div>
+  </section>
+
+  <section class="details-grid">
+    <article class="detail-card detail-card--venue">
+      <p class="section-tag">Where love awaits</p>
+      <h2>Our cherished venue</h2>
+      <p class="detail-title">{{ couple.locationLabel }}</p>
+      <p>{{ couple.address }}</p>
+      <a class="text-link" href="https://maps.app.goo.gl/qPji1a7Sqg8RRTpm9" target="_blank" rel="noreferrer">Get directions</a>
+    </article>
+
+    <article class="detail-card detail-card--rsvp">
+      <p class="section-tag">Join the celebration</p>
+      <h2>Celebrate with us</h2>
+      <p>For blessings, confirmations, travel help, and family coordination, please connect with us directly.</p>
+      <a class="text-link" [href]="'tel:' + couple.rsvpPhone1">{{ couple.rsvpPhone1 }}</a><br />
+      <a class="text-link" [href]="'tel:' + couple.rsvpPhone2">{{ couple.rsvpPhone2 }}</a>
+    </article>
+  </section>
+
+  <section class="schedule-section" id="celebrations">
+    <div class="section-heading">
+      <p class="section-tag">The celebration unfolds</p>
+      <h2>Three heartfelt ceremonies, one unforgettable union.</h2>
+    </div>
+
+    <div class="event-grid">
+      <article class="event-card" *ngFor="let event of events; trackBy: trackByTitle" [attr.data-accent]="event.accent">
+        <p class="event-day">{{ event.day }}</p>
+        <h3>{{ event.title }}</h3>
+        <p class="event-time">{{ event.time }}</p>
+        <p class="event-venue">{{ event.venue }}</p>
+        <p class="event-note">{{ event.note }}</p>
+      </article>
+    </div>
+  </section>
+
+  <section class="footer-card">
+    <p class="section-tag">With love</p>
+    <h2>We cannot wait to celebrate this sacred day with you.</h2>
+    <p>With warm regards from our families.</p>
+  </section>
+</main>

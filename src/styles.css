@@ -1,0 +1,47 @@
+:root {
+  color-scheme: light;
+  --page-background:
+    radial-gradient(circle at top, rgba(255, 248, 237, 0.92), rgba(249, 240, 229, 0.94) 35%, rgba(243, 235, 225, 0.98) 100%);
+  --text-color: #3e2a20;
+  --body-font: "Trebuchet MS", "Segoe UI", sans-serif;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+html,
+body {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  color: var(--text-color);
+  background: var(--page-background);
+  font-family: var(--body-font);
+  text-rendering: optimizeLegibility;
+  overflow-x: hidden;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+img,
+video,
+canvas,
+svg {
+  display: block;
+  max-width: 100%;
+}
+
+a,
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
