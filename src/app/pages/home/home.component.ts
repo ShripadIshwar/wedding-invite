@@ -88,7 +88,7 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
     },
     {
       day: '14 May',
-      title: 'Reception Lunch',
+      title: 'Reception',
       time: '12:00 Noon onwards',
       venue: 'Kaluthi Kalyan Mantappa',
       accent: 'twilight',
